@@ -1,14 +1,90 @@
-<html>
-    <head></head>
-    <body>
-        <header>
-            <h1> Hotel Management System</h1>
-            <nav>
-              
-              <a href="./rooms.html">Rooms</a>
-              <a href="./guest.html">Guests</a>
-              <a href="bookings.html">Bookings</a>
-            </nav>
-          </header>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Management System - Bookings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1>🏨 Hotel Management System</h1>
+        <nav>
+          <a href="index.html">Dashboard</a>
+          <a href="rooms.html">Rooms</a>
+          <a href="guests.html">Guests</a>
+          <a href="bookings.html" class="active">Bookings</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Booking Management</h2>
+        <button class="btn" onclick="toggleForm()">New Booking</button>
+      </div>
+      
+      <table id="bookingsTable">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Guest Name</th>
+            <th>Room No</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Booking Form -->
+    <div id="bookingForm" class="form-section">
+      <h3>Create New Booking</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="bookingGuest">Select Guest</label>
+          <select id="bookingGuest" required>
+            <option value="">Select Guest</option>
+            <option value="1">John Doe</option>
+            <option value="2">Jane Smith</option>
+            <option value="3">Mike Johnson</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bookingRoom">Select Room</label>
+          <select id="bookingRoom" required>
+            <option value="">Select Room</option>
+            <option value="101">Room 101 - Deluxe (₹2500)</option>
+            <option value="103">Room 103 - Suite (₹4000)</option>
+            <option value="202">Room 202 - Deluxe (₹2500)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bookingCheckin">Check-in Date</label>
+          <input type="date" id="bookingCheckin" required>
+        </div>
+        <div class="form-group">
+          <label for="bookingCheckout">Check-out Date</label>
+          <input type="date" id="bookingCheckout" required>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="addBooking()">Create Booking</button>
+        <button class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="bookings.js"></script>
+</body>
 </html>

@@ -1,18 +1,78 @@
-<html>
-    <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Management System - Guests</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1>🏨 Hotel Management System</h1>
+        <nav>
+          <a href="index.html">Dashboard</a>
+          <a href="rooms.html">Rooms</a>
+          <a href="guests.html" class="active">Guests</a>
+          <a href="bookings.html">Bookings</a>
+        </nav>
+      </div>
+    </div>
+  </header>
 
-    </head>
-    <body>
-        <header>
-            <h1> Hotel Management System</h1>
-            <nav>
-              
-              <a href="./rooms.html">Rooms</a>
-              <a href="./guest.html">Guests</a>
-              <a href="bookings.html">Bookings</a>
-            </nav>
-          </header>
-        <h1>checked out guest</h1>
-        <h1>checked in guest</h1>
-    </body>
+  <div class="container">
+    <div class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Guest Management</h2>
+        <button class="btn" onclick="toggleForm()">Add New Guest</button>
+      </div>
+      
+      <table id="guestsTable">
+        <thead>
+          <tr>
+            <th>Guest ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Check-in Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Guest Form -->
+    <div id="guestForm" class="form-section">
+      <h3>Add New Guest</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="guestName">Full Name</label>
+          <input type="text" id="guestName" required>
+        </div>
+        <div class="form-group">
+          <label for="guestEmail">Email</label>
+          <input type="email" id="guestEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="guestPhone">Phone Number</label>
+          <input type="tel" id="guestPhone" required>
+        </div>
+        <div class="form-group">
+          <label for="guestCheckin">Check-in Date</label>
+          <input type="date" id="guestCheckin" required>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="addGuest()">Add Guest</button>
+        <button class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="guests.js"></script>
+</body>
 </html>

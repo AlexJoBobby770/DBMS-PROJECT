@@ -3,37 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotel Management System</title>
+  <title>Hotel Management System - Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1> Hotel Management System</h1>
-    <nav>
-      <a href="#">Home</a>
-      <a href="./rooms.html">Rooms</a>
-      <a href="./guest.html">Guests</a>
-      <a href="bookings.html">Bookings</a>
-    </nav>
+    <div class="container">
+      <div class="header-content">
+        <h1>🏨 Hotel Management System</h1>
+        <nav>
+          <a href="index.html" class="active">Dashboard</a>
+          <a href="rooms.html">Rooms</a>
+          <a href="guests.html">Guests</a>
+          <a href="bookings.html">Bookings</a>
+        </nav>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <h2>Available Rooms</h2>
-    <table id="roomsTable">
-      <thead>
-        <tr>
-          <th>Room No</th>
-          <th>Type</th>
-          <th>Price</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- JS will fill this -->
-      </tbody>
-    </table>
-  </main>
+  <div class="container">
+    <!-- Dashboard Stats -->
+    <div class="dashboard">
+      <div class="stat-card">
+        <div class="stat-number" id="totalRooms">12</div>
+        <div class="stat-label">Total Rooms</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="availableRooms">8</div>
+        <div class="stat-label">Available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="bookedRooms">3</div>
+        <div class="stat-label">Booked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="totalGuests">15</div>
+        <div class="stat-label">Total Guests</div>
+      </div>
+    </div>
 
-  <script src="script.js"></script>
+    <div class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Welcome to Hotel Management System</h2>
+      </div>
+      <div style="text-align: center; padding: 2rem; color: #666;">
+        <p>Manage your hotel efficiently with our system!</p>
+        <p>Navigate using the menu above to manage rooms, guests, and bookings.</p>
+        <br>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="rooms.html" class="btn">Manage Rooms</a>
+          <a href="guests.html" class="btn">Manage Guests</a>
+          <a href="bookings.html" class="btn">Manage Bookings</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Overview -->
+    <div class="main-content">
+      <h3>Recent Activities</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Details</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Room Booking</td>
+            <td>Room 102 booked by John Doe</td>
+            <td>2 hours ago</td>
+          </tr>
+          <tr>
+            <td>Guest Check-in</td>
+            <td>Jane Smith checked into Room 201</td>
+            <td>4 hours ago</td>
+          </tr>
+          <tr>
+            <td>Room Maintenance</td>
+            <td>Room 301 marked for cleaning</td>
+            <td>6 hours ago</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
 </html>

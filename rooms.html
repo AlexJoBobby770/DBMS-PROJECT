@@ -1,25 +1,87 @@
-<html>
-    <head>
-        <title>Rooms</title>
-    </head>
-    <body>
-        <header>
-            <h1> Hotel Management System</h1>
-            <nav>
-              
-              <a href="./rooms.html">Rooms</a>
-              <a href="./guest.html">Guests</a>
-              <a href="bookings.html">Bookings</a>
-            </nav>
-          </header>
-        <h1>Rooms</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Room Number</th>
-                    <th>Room Type</th>
-                </tr>
-            </thead>
-        </table>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Management System - Rooms</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1>🏨 Hotel Management System</h1>
+        <nav>
+          <a href="index.html">Dashboard</a>
+          <a href="rooms.html" class="active">Rooms</a>
+          <a href="guests.html">Guests</a>
+          <a href="bookings.html">Bookings</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Room Management</h2>
+        <button class="btn" onclick="toggleForm()">Add New Room</button>
+      </div>
+      
+      <table id="roomsTable">
+        <thead>
+          <tr>
+            <th>Room No</th>
+            <th>Type</th>
+            <th>Price (₹)</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Add Room Form -->
+    <div id="roomForm" class="form-section">
+      <h3>Add New Room</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="roomNumber">Room Number</label>
+          <input type="text" id="roomNumber" required>
+        </div>
+        <div class="form-group">
+          <label for="roomType">Room Type</label>
+          <select id="roomType" required>
+            <option value="">Select Type</option>
+            <option value="Standard">Standard</option>
+            <option value="Deluxe">Deluxe</option>
+            <option value="Suite">Suite</option>
+            <option value="Presidential">Presidential</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="roomPrice">Price per Night (₹)</label>
+          <input type="number" id="roomPrice" required>
+        </div>
+        <div class="form-group">
+          <label for="roomStatus">Status</label>
+          <select id="roomStatus" required>
+            <option value="Available">Available</option>
+            <option value="Booked">Booked</option>
+            <option value="Maintenance">Maintenance</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" onclick="addRoom()">Add Room</button>
+        <button class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="rooms.js"></script>
+</body>
 </html>
