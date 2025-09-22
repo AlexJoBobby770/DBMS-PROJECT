@@ -1,11 +1,10 @@
-// Sample booking data - replace with API calls to your MySQL backend
+
 let bookings = [
     { id: 1, guest_name: "John Doe", room_no: "102", checkin: "2024-01-15", checkout: "2024-01-17", amount: 3000, status: "Confirmed" },
     { id: 2, guest_name: "Jane Smith", room_no: "201", checkin: "2024-01-16", checkout: "2024-01-18", amount: 3000, status: "Confirmed" },
     { id: 3, guest_name: "Mike Johnson", room_no: "103", checkin: "2024-01-20", checkout: "2024-01-23", amount: 12000, status: "Pending" }
   ];
   
-  // Load bookings when page loads
   document.addEventListener('DOMContentLoaded', function() {
     loadBookings();
   });
@@ -49,7 +48,6 @@ let bookings = [
       return;
     }
     
-    // Calculate amount based on room price and days (simplified)
     const roomPrices = {
       '101': 2500,
       '103': 4000,
@@ -62,9 +60,9 @@ let bookings = [
     const amount = roomPrices[roomNo] * days;
     
     const guestNames = {
-      '1': 'John Doe',
-      '2': 'Jane Smith',
-      '3': 'Mike Johnson'
+      '1': 'Aljean',
+      '2': 'Alex Jo',
+      '3': 'Aman Faiz'
     };
     
     const newBooking = {
