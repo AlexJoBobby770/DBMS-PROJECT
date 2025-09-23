@@ -1,18 +1,24 @@
 
-let bookings = [
-    { id: 1, guest_name: "John Doe", room_no: "102", checkin: "2024-01-15", checkout: "2024-01-17", amount: 3000, status: "Confirmed" },
-    { id: 2, guest_name: "Jane Smith", room_no: "201", checkin: "2024-01-16", checkout: "2024-01-18", amount: 3000, status: "Confirmed" },
-    { id: 3, guest_name: "Mike Johnson", room_no: "103", checkin: "2024-01-20", checkout: "2024-01-23", amount: 12000, status: "Pending" }
-  ];
+let bookings = [];
   
   document.addEventListener('DOMContentLoaded', function() {
     loadBookings();
+    populateFormOptions();
   });
   
-  function loadBookings() {
+  async function loadBookings() {
+    try {
+      const res = await fetch('/api/bookings');
+      if (!res.ok) throw new Error('Failed to fetch bookings');
+      bookings = await res.json();
+    } catch (e) {
+      console.error('Error loading bookings', e);
+      alert('Failed to load bookings');
+      bookings = [];
+    }
+
     const tbody = document.querySelector('#bookingsTable tbody');
     tbody.innerHTML = '';
-    
     bookings.forEach(booking => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -37,58 +43,32 @@ let bookings = [
     form.classList.toggle('active');
   }
   
-  function addBooking() {
+  async function addBooking() {
     const guestId = document.getElementById('bookingGuest').value;
-    const roomNo = document.getElementById('bookingRoom').value;
-    const checkin = document.getElementById('bookingCheckin').value;
-    const checkout = document.getElementById('bookingCheckout').value;
+    const roomId = document.getElementById('bookingRoom').value;
+    const check_in_date = document.getElementById('bookingCheckin').value;
+    const check_out_date = document.getElementById('bookingCheckout').value;
     
-    if (!guestId || !roomNo || !checkin || !checkout) {
+    if (!guestId || !roomId || !check_in_date || !check_out_date) {
       alert('Please fill all fields');
       return;
     }
-    
-    const roomPrices = {
-      '101': 2500,
-      '103': 4000,
-      '202': 2500
-    };
-    
-    const checkinDate = new Date(checkin);
-    const checkoutDate = new Date(checkout);
-    const days = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
-    const amount = roomPrices[roomNo] * days;
-    
-    const guestNames = {
-      '1': 'Aljean',
-      '2': 'Alex Jo',
-      '3': 'Aman Faiz'
-    };
-    
-    const newBooking = {
-      id: Math.max(...bookings.map(b => b.id)) + 1,
-      guest_name: guestNames[guestId],
-      room_no: roomNo,
-      checkin: checkin,
-      checkout: checkout,
-      amount: amount,
-      status: "Confirmed"
-    };
-    
-    // TODO: Replace with API call to your MySQL backend
-    // Also need to update room status to "Booked"
-    // fetch('/api/bookings', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(newBooking)
-    // });
-    
-    bookings.push(newBooking);
-    loadBookings();
-    toggleForm();
-    clearForm();
-    
-    alert(`Booking created successfully!\nTotal Amount: ₹${amount} for ${days} days`);
+
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guest_id: Number(guestId), room_id: Number(roomId), check_in_date, check_out_date })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create booking');
+      alert('Booking created successfully!');
+      clearForm();
+      toggleForm();
+      loadBookings();
+    } catch (e) {
+      alert(e.message);
+    }
   }
   
   function editBooking(id) {
@@ -99,17 +79,16 @@ let bookings = [
     }
   }
   
-  function cancelBooking(id) {
-    if (confirm('Are you sure you want to cancel this booking?')) {
-      // TODO: Replace with API call to update booking status
-      // Also need to update room status back to "Available"
-      
-      const booking = bookings.find(b => b.id === id);
-      if (booking) {
-        booking.status = "Cancelled";
-        loadBookings();
-        alert('Booking cancelled successfully!');
-      }
+  async function cancelBooking(id) {
+    if (!confirm('Are you sure you want to cancel this booking?')) return;
+    try {
+      const res = await fetch(`/api/bookings/${id}/cancel`, { method: 'PUT' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to cancel booking');
+      alert('Booking cancelled successfully!');
+      loadBookings();
+    } catch (e) {
+      alert(e.message);
     }
   }
   
@@ -118,4 +97,21 @@ let bookings = [
     document.getElementById('bookingRoom').value = '';
     document.getElementById('bookingCheckin').value = '';
     document.getElementById('bookingCheckout').value = '';
+  }
+
+  async function populateFormOptions() {
+    // Populate guests
+    try {
+      const gres = await fetch('/api/guests');
+      const guests = await gres.json();
+      const guestSelect = document.getElementById('bookingGuest');
+      guestSelect.innerHTML = '<option value="">Select Guest</option>' + guests.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    } catch {}
+    // Populate rooms (available only)
+    try {
+      const rres = await fetch('/api/rooms');
+      const rooms = await rres.json();
+      const roomSelect = document.getElementById('bookingRoom');
+      roomSelect.innerHTML = '<option value="">Select Room</option>' + rooms.filter(r => r.status === 'Available').map(r => `<option value="${r.id}">Room ${r.room_number} - ${r.room_type} (₹${r.price})</option>`).join('');
+    } catch {}
   }

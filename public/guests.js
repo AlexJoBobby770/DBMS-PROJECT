@@ -1,20 +1,23 @@
-// Sample guest data - replace with API calls to your MySQL backend
-let guests = [
-    { id: 1, name: "John Doe", email: "john@email.com", phone: "+91-9876543210", checkin: "2024-01-15" },
-    { id: 2, name: "Jane Smith", email: "jane@email.com", phone: "+91-9876543211", checkin: "2024-01-16" },
-    { id: 3, name: "Mike Johnson", email: "mike@email.com", phone: "+91-9876543212", checkin: "2024-01-17" },
-    { id: 4, name: "Sarah Wilson", email: "sarah@email.com", phone: "+91-9876543213", checkin: "2024-01-18" }
-  ];
+let guests = [];
   
   // Load guests when page loads
   document.addEventListener('DOMContentLoaded', function() {
     loadGuests();
   });
   
-  function loadGuests() {
+  async function loadGuests() {
+    try {
+      const res = await fetch('/api/guests');
+      if (!res.ok) throw new Error('Failed to fetch guests');
+      guests = await res.json();
+    } catch (e) {
+      console.error('Error loading guests', e);
+      alert('Failed to load guests');
+      guests = [];
+    }
+
     const tbody = document.querySelector('#guestsTable tbody');
     tbody.innerHTML = '';
-    
     guests.forEach(guest => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -22,7 +25,7 @@ let guests = [
         <td>${guest.name}</td>
         <td>${guest.email}</td>
         <td>${guest.phone}</td>
-        <td>${guest.checkin}</td>
+        <td>${guest.check_in_date || ''}</td>
         <td>
           <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem; margin-right: 0.5rem;" onclick="editGuest(${guest.id})">Edit</button>
           <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="deleteGuest(${guest.id})">Delete</button>
@@ -37,44 +40,32 @@ let guests = [
     form.classList.toggle('active');
   }
   
-  function addGuest() {
+  async function addGuest() {
     const name = document.getElementById('guestName').value;
     const email = document.getElementById('guestEmail').value;
     const phone = document.getElementById('guestPhone').value;
-    const checkin = document.getElementById('guestCheckin').value;
+    const check_in_date = document.getElementById('guestCheckin').value;
     
-    if (!name || !email || !phone || !checkin) {
+    if (!name || !email || !phone || !check_in_date) {
       alert('Please fill all fields');
       return;
     }
-    
-    // Check if email already exists
-    if (guests.find(guest => guest.email === email)) {
-      alert('Guest with this email already exists!');
-      return;
+
+    try {
+      const res = await fetch('/api/guests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, check_in_date })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add guest');
+      alert('Guest added successfully!');
+      clearForm();
+      toggleForm();
+      loadGuests();
+    } catch (e) {
+      alert(e.message);
     }
-    
-    const newGuest = {
-      id: Math.max(...guests.map(g => g.id)) + 1,
-      name: name,
-      email: email,
-      phone: phone,
-      checkin: checkin
-    };
-    
-    // TODO: Replace with API call to your MySQL backend
-    // fetch('/api/guests', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(newGuest)
-    // });
-    
-    guests.push(newGuest);
-    loadGuests();
-    toggleForm();
-    clearForm();
-    
-    alert('Guest added successfully!');
   }
   
   function editGuest(id) {
@@ -93,14 +84,16 @@ let guests = [
     }
   }
   
-  function deleteGuest(id) {
-    if (confirm('Are you sure you want to delete this guest?')) {
-      // TODO: Replace with API call to delete from MySQL
-      // fetch(`/api/guests/${id}`, { method: 'DELETE' });
-      
-      guests = guests.filter(guest => guest.id !== id);
-      loadGuests();
+  async function deleteGuest(id) {
+    if (!confirm('Are you sure you want to delete this guest?')) return;
+    try {
+      const res = await fetch(`/api/guests/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete guest');
       alert('Guest deleted successfully!');
+      loadGuests();
+    } catch (e) {
+      alert(e.message);
     }
   }
   
