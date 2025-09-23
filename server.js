@@ -1,8 +1,10 @@
 const express = require("express");
 const mysql = require("mysql2");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public"))); // serve frontend
 
 const db = mysql.createConnection({
   host: "localhost",
@@ -16,7 +18,6 @@ db.connect(err => {
   console.log("MySQL connected!");
 });
 
-
 app.get("/guests", (req, res) => {
   db.query("SELECT * FROM guests", (err, results) => {
     if (err) throw err;
@@ -24,6 +25,6 @@ app.get("/guests", (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+app.listen(8000, () => {
+  console.log("Server running on http://localhost:8000");
 });
