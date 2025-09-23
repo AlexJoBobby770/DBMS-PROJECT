@@ -95,6 +95,23 @@ app.delete("/api/rooms/:id", (req, res) => {
   });
 });
 
+// Dashboard stats
+app.get("/api/stats", (req, res) => {
+  const sql = `
+    SELECT 
+      (SELECT COUNT(*) FROM rooms) AS totalRooms,
+      (SELECT COUNT(*) FROM rooms WHERE status = 'Available') AS availableRooms,
+      (SELECT COUNT(*) FROM rooms WHERE status = 'Booked') AS bookedRooms,
+      (SELECT COUNT(*) FROM guests) AS totalGuests`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.error("Error fetching stats:", err);
+      return res.status(500).json({ error: "Failed to fetch stats" });
+    }
+    res.json(rows[0] || { totalRooms: 0, availableRooms: 0, bookedRooms: 0, totalGuests: 0 });
+  });
+});
+
 // Guests API
 app.get("/api/guests", (req, res) => {
   const sql = "SELECT id, name, email, phone, check_in_date FROM guests ORDER BY id DESC";
