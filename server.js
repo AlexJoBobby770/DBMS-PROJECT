@@ -8,7 +8,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-
 // Database configuration for XAMPP
 const dbConfig = {
   host: "localhost",
@@ -16,14 +15,13 @@ const dbConfig = {
   password: "", // Default XAMPP password is empty
   database: "hotel_db",
   port: 3306, // Default MySQL port
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  acquireTimeout: 60000,
+  timeout: 60000,
+  reconnect: true
 };
 
-// Create a connection pool instead of single connection
-const db = mysql.createPool(dbConfig);
-
+// Create database connection
+const db = mysql.createConnection(dbConfig);
 
 // Connect to database with error handling
 db.connect(err => {
