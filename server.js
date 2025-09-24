@@ -12,18 +12,17 @@ app.use(express.static(path.join(__dirname, "public")));
 const dbConfig = {
   host: "localhost",
   user: "root",
-  password: "", // Default XAMPP password is empty
+  password: "", 
   database: "hotel_db",
-  port: 3306, // Default MySQL port
+  port: 3306, 
   acquireTimeout: 60000,
   timeout: 60000,
   reconnect: true
 };
 
-// Create database connection
+
 const db = mysql.createConnection(dbConfig);
 
-// Connect to database with error handling
 db.connect(err => {
   if (err) {
     console.error("Database connection failed:", err.message);
@@ -36,19 +35,17 @@ db.connect(err => {
   console.log("✅ MySQL connected successfully!");
   console.log("🚀 Database: hotel_db");
 });
-
-// Handle database connection errors
 db.on('error', (err) => {
   console.error('Database error:', err);
   if(err.code === 'PROTOCOL_CONNECTION_LOST') {
     console.log('Attempting to reconnect...');
-    // Handle reconnection logic here if needed
+ 
   }
 });
 
-// =============================================================================
+
 // ROOMS API ENDPOINTS
-// =============================================================================
+
 
 // GET all rooms
 app.get("/api/rooms", (req, res) => {
@@ -71,13 +68,13 @@ app.post("/api/rooms", (req, res) => {
     return res.status(400).json({ error: "Missing required fields: room_number, room_type, price, status" });
   }
 
-  // Validate room_type
+  
   const validTypes = ['Standard', 'Deluxe', 'Suite', 'Presidential'];
   if (!validTypes.includes(room_type)) {
     return res.status(400).json({ error: "Invalid room_type. Must be: " + validTypes.join(', ') });
   }
 
-  // Validate status
+
   const validStatuses = ['Available', 'Booked', 'Maintenance'];
   if (!validStatuses.includes(status)) {
     return res.status(400).json({ error: "Invalid status. Must be: " + validStatuses.join(', ') });
@@ -99,7 +96,6 @@ app.post("/api/rooms", (req, res) => {
   });
 });
 
-// UPDATE a room
 app.put("/api/rooms/:id", (req, res) => {
   const { id } = req.params;
   const { room_number, room_type, price, status } = req.body;
@@ -126,11 +122,10 @@ app.put("/api/rooms/:id", (req, res) => {
   });
 });
 
-// DELETE a room
+
 app.delete("/api/rooms/:id", (req, res) => {
   const { id } = req.params;
   
-  // First check if room has active bookings
   const checkBookingsSql = "SELECT COUNT(*) as count FROM bookings WHERE room_id = ? AND status IN ('Confirmed', 'Pending')";
   db.query(checkBookingsSql, [id], (err, results) => {
     if (err) {
@@ -158,9 +153,7 @@ app.delete("/api/rooms/:id", (req, res) => {
   });
 });
 
-// =============================================================================
 // GUESTS API ENDPOINTS  
-// =============================================================================
 
 // GET all guests
 app.get("/api/guests", (req, res) => {
@@ -208,7 +201,6 @@ app.post("/api/guests", (req, res) => {
 app.delete("/api/guests/:id", (req, res) => {
   const { id } = req.params;
   
-  // First check if guest has active bookings
   const checkBookingsSql = "SELECT COUNT(*) as count FROM bookings WHERE guest_id = ? AND status IN ('Confirmed', 'Pending')";
   db.query(checkBookingsSql, [id], (err, results) => {
     if (err) {
@@ -236,9 +228,8 @@ app.delete("/api/guests/:id", (req, res) => {
   });
 });
 
-// =============================================================================
+
 // BOOKINGS API ENDPOINTS
-// =============================================================================
 
 // GET all bookings using the view
 app.get("/api/bookings", (req, res) => {
@@ -377,9 +368,7 @@ app.put("/api/bookings/:id/cancel", (req, res) => {
   });
 });
 
-// =============================================================================
 // DASHBOARD STATS ENDPOINT
-// =============================================================================
 
 app.get("/api/stats", (req, res) => {
   const sql = `
@@ -401,21 +390,16 @@ app.get("/api/stats", (req, res) => {
   });
 });
 
-// =============================================================================
-// SERVE FRONTEND
-// =============================================================================
 
 // Serve main page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Handle 404s
 app.use((req, res) => {
   res.status(404).json({ error: "Endpoint not found" });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({ error: "Internal server error" });
