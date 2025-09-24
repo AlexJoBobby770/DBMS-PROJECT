@@ -30,7 +30,8 @@ app.get("/guests", (req, res) => {
 // Rooms CRUD API
 // GET all rooms
 app.get("/api/rooms", (req, res) => {
-  const sql = "SELECT id, room_number, room_type, price, status FROM rooms ORDER BY room_number";
+  // Prefer id if exists; otherwise alias room_number as id
+  const sql = "SELECT room_number AS id, room_number, room_type, price, status FROM rooms ORDER BY room_number";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching rooms:", err);
@@ -114,7 +115,8 @@ app.get("/api/stats", (req, res) => {
 
 // Guests API
 app.get("/api/guests", (req, res) => {
-  const sql = "SELECT id, name, email, phone, check_in_date FROM guests ORDER BY id DESC";
+  // Use email as a stable identifier if numeric id is not present
+  const sql = "SELECT email AS id, name, email, phone, check_in_date FROM guests ORDER BY name";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching guests:", err);
@@ -160,26 +162,63 @@ app.delete("/api/guests/:id", (req, res) => {
 
 // Bookings API (read-only list from view)
 app.get("/api/bookings", (req, res) => {
-  // Use the view if available, else join tables
-  const sql = `
+  // Try the view first (matches your provided SQL)
+  const viewSql = `
     SELECT 
-      b.id AS id,
-      g.name AS guest_name,
-      r.room_number AS room_no,
-      b.check_in_date AS checkin,
-      b.check_out_date AS checkout,
-      b.total_amount AS amount,
-      b.status AS status
-    FROM bookings b
-    JOIN guests g ON b.guest_id = g.id
-    JOIN rooms r ON b.room_id = r.id
-    ORDER BY b.id DESC`;
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error fetching bookings:", err);
-      return res.status(500).json({ error: "Failed to fetch bookings" });
-    }
-    res.json(results);
+      booking_id AS id,
+      guest_name,
+      room_number AS room_no,
+      check_in_date AS checkin,
+      check_out_date AS checkout,
+      total_amount AS amount,
+      status
+    FROM room_booking_details
+    ORDER BY booking_id DESC`;
+
+  db.query(viewSql, (err, results) => {
+    if (!err) return res.json(results);
+
+    // Fallback 1: join using numeric ids if those exist
+    const joinWithIds = `
+      SELECT 
+        /* synthetic id to avoid missing column issues */
+        CONCAT(g.name,'-',r.room_number,'-',DATE_FORMAT(b.check_in_date,'%Y%m%d')) AS id,
+        g.name AS guest_name,
+        r.room_number AS room_no,
+        b.check_in_date AS checkin,
+        b.check_out_date AS checkout,
+        b.total_amount AS amount,
+        b.status AS status
+      FROM bookings b
+      JOIN guests g ON b.guest_id = g.id
+      JOIN rooms r ON b.room_id = r.id
+      ORDER BY b.check_in_date DESC`;
+
+    db.query(joinWithIds, (err2, results2) => {
+      if (!err2) return res.json(results2);
+
+      // Fallback 2: join using room_number if bookings stores room_no
+      const joinWithRoomNo = `
+        SELECT 
+          CONCAT(g.name,'-',b.room_no,'-',DATE_FORMAT(b.check_in_date,'%Y%m%d')) AS id,
+          g.name AS guest_name,
+          b.room_no AS room_no,
+          b.check_in_date AS checkin,
+          b.check_out_date AS checkout,
+          b.total_amount AS amount,
+          b.status AS status
+        FROM bookings b
+        JOIN guests g ON b.guest_id = g.id
+        ORDER BY b.check_in_date DESC`;
+
+      db.query(joinWithRoomNo, (err3, results3) => {
+        if (err3) {
+          console.error("Error fetching bookings:", err, err2, err3);
+          return res.status(500).json({ error: "Failed to fetch bookings" });
+        }
+        res.json(results3);
+      });
+    });
   });
 });
 
